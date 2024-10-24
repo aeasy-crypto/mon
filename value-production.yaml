@@ -1,0 +1,85 @@
+namespaceOverride: "monitoring"
+
+global:
+  imageRegistry: "focker.ir"
+
+
+alertmanager:
+  enabled: true
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    servicePort: 9093
+    hosts:
+      - alert.local.local
+    paths:
+     - /
+    pathType: ImplementationSpecific
+    annotations: 
+      nginx.ingress.kubernetes.io/auth-type: "basic"
+      nginx.ingress.kubernetes.io/auth-secret: "basic-auth"
+      nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+
+
+grafana:
+  defaultDashboardsTimezone: Asia/Tehran
+
+  adminPassword: admin
+  initChownData:
+     enabled: true
+
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations: 
+       kubernetes.io/ingress.class: nginx
+    hosts: [grafana.local.local]
+    path: /
+  persistence:
+    enabled: true
+    type: pvc
+    storageClassName: nfs-storage
+    accessModes:
+      - ReadWriteOnce
+    size: 5Gi
+
+prometheusOperator:
+  tls:
+    enabled: false
+
+prometheus:
+  enabled: true
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations: 
+      nginx.ingress.kubernetes.io/auth-type: "basic"
+      nginx.ingress.kubernetes.io/auth-secret: "basic-auth"
+      nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
+    labels: {}
+    servicePort: 9090
+    hosts: [prometheus.local.local]
+  prometheusSpec:
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Retain
+      whenScaled: Retain
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 2Gi  
+          storageClassName: nfs-storage 
+    additionalScrapeConfigs:
+      - job_name: test
+        metrics_path: '/metrics/'
+        static_configs:
+          - targets: 
+              - 'sample.local:8028'
+      - job_name: vms
+        metrics_path: '/metrics/'
+        static_configs:
+          - targets: 
+              - '192.168.56.104:9100'
