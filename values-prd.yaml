@@ -46,6 +46,9 @@ grafana:
 prometheusOperator:
   tls:
     enabled: false
+  admissionWebhooks:
+    patch:
+      ttlSecondsAfterFinished: 30
 
 prometheus:
   enabled: true
