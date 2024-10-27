@@ -45,7 +45,7 @@ grafana:
     size: 5Gi
   serviceAccount:
     create: false
-    autoMount: false
+    autoMount: true
 
 prometheusOperator:
   tls:
