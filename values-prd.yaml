@@ -23,7 +23,8 @@ alertmanager:
 
 grafana:
   defaultDashboardsTimezone: Asia/Tehran
-
+  forceDeployDashboards: true
+  defaultDashboardsEnabled: true
   adminPassword: admin
   initChownData:
      enabled: true
@@ -42,6 +43,9 @@ grafana:
     accessModes:
       - ReadWriteOnce
     size: 5Gi
+  serviceAccount:
+    create: false
+    autoMount: false
 
 prometheusOperator:
   tls:
